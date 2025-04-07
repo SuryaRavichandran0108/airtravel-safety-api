@@ -1,0 +1,9 @@
+
+{
+  "name": "airtravel-safety-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "googleapis": "^118.0.0"
+  }
+}
