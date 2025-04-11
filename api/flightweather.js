@@ -38,13 +38,21 @@ module.exports = async (req, res) => {
     const arr = matchedFlight.arrival;
 
    const getWeather = async (coords, label) => {
-  console.log(JSON.stringify({ label, coords })); // Reliable in Vercel logs
+  console.log(`${label} coords:`, coords); // this will help us see logs in Vercel
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${OPENWEATHER_KEY}&units=imperial`;
   const response = await fetch(url);
   return await response.json();
 };
 
-    const depWeather = dep.airport.position
+// Force logging of coordinates before trying to fetch weather
+if (dep.airport.position) {
+  console.log("Departure coords:", dep.airport.position);
+}
+if (arr.airport.position) {
+  console.log("Arrival coords:", arr.airport.position);
+}
+
+const depWeather = dep.airport.position
   ? await getWeather({
       lat: dep.airport.position.latitude,
       lon: dep.airport.position.longitude
@@ -57,6 +65,7 @@ const arrWeather = arr.airport.position
       lon: arr.airport.position.longitude
     }, "Arrival")
   : null;
+
 
     res.status(200).json({
       flight: flightNumber.toUpperCase(),
