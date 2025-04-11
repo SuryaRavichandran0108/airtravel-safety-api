@@ -67,7 +67,7 @@ const arrWeather = arr.airport.position
   : null;
 
 
-   res.status(200).json({
+  res.status(200).json({
   flight: flightNumber.toUpperCase(),
   departure: {
     airport: dep.airport.name,
