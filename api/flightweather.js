@@ -37,25 +37,27 @@ module.exports = async (req, res) => {
     const dep = matchedFlight.departure;
     const arr = matchedFlight.arrival;
 
-    const getWeather = async (coords) => {
-      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${OPENWEATHER_KEY}&units=imperial`;
-      const response = await fetch(url);
-      return await response.json();
-    };
+   const getWeather = async (coords, label) => {
+  console.log(`${label} coords:`, coords);  // NEW
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${OPENWEATHER_KEY}&units=imperial`;
+  const response = await fetch(url);
+  return await response.json();
+};
 
     const depWeather = dep.airport.position
-      ? await getWeather({
-          lat: dep.airport.position.latitude,
-          lon: dep.airport.position.longitude
-        })
-      : null;
+  ? await getWeather({
+      lat: dep.airport.position.latitude,
+      lon: dep.airport.position.longitude
+    }, "Departure")
+  : null;
 
-    const arrWeather = arr.airport.position
-      ? await getWeather({
-          lat: arr.airport.position.latitude,
-          lon: arr.airport.position.longitude
-        })
-      : null;
+const arrWeather = arr.airport.position
+  ? await getWeather({
+      lat: arr.airport.position.latitude,
+      lon: arr.airport.position.longitude
+    }, "Arrival")
+  : null;
+
 
     res.status(200).json({
       flight: flightNumber.toUpperCase(),
