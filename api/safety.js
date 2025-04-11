@@ -4,6 +4,10 @@ const SHEET_ID = '1oCBdA6sp_XOTAWgMDrVsSrSQo8_n2WcLwhusJ4C6NGw';
 const API_KEY = process.env.GOOGLE_API_KEY;
 
 module.exports = async (req, res) => {
+  // ✅ Add CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*'); 
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   try {
     // --- Get SafetyData values (long-term fatality rates) ---
     const safetyURL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/SafetyData!A2:B6?key=${API_KEY}`;
