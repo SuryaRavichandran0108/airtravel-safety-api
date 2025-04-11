@@ -16,9 +16,9 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Step 1: Use the no-date endpoint for broader matching
+    // Step 1: Get flight info from AeroDataBox (no date version)
     const aeroURL = `https://${RAPIDAPI_HOST}/flights/number/${flightNumber}`;
-    
+
     const flightRes = await fetch(aeroURL, {
       method: 'GET',
       headers: {
@@ -34,18 +34,28 @@ module.exports = async (req, res) => {
     }
 
     const matchedFlight = flightData[0];
-
     const dep = matchedFlight.departure;
     const arr = matchedFlight.arrival;
 
-    const getWeather = async (iata) => {
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${iata}&appid=${OPENWEATHER_KEY}&units=imperial`;
+    const getWeather = async (coords) => {
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${OPENWEATHER_KEY}&units=imperial`;
       const response = await fetch(url);
       return await response.json();
     };
 
-    const depWeather = await getWeather(dep.airport.iata);
-    const arrWeather = await getWeather(arr.airport.iata);
+    const depWeather = dep.airport.position
+      ? await getWeather({
+          lat: dep.airport.position.latitude,
+          lon: dep.airport.position.longitude
+        })
+      : null;
+
+    const arrWeather = arr.airport.position
+      ? await getWeather({
+          lat: arr.airport.position.latitude,
+          lon: arr.airport.position.longitude
+        })
+      : null;
 
     res.status(200).json({
       flight: flightNumber.toUpperCase(),
@@ -53,13 +63,13 @@ module.exports = async (req, res) => {
         airport: dep.airport.name,
         iata: dep.airport.iata,
         scheduledTime: dep.scheduledTimeLocal,
-        weather: depWeather.weather ? depWeather.weather[0].description : "Unavailable"
+        weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable"
       },
       arrival: {
         airport: arr.airport.name,
         iata: arr.airport.iata,
         scheduledTime: arr.scheduledTimeLocal,
-        weather: arrWeather.weather ? arrWeather.weather[0].description : "Unavailable"
+        weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable"
       }
     });
 
