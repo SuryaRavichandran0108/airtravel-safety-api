@@ -4,6 +4,36 @@ const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = 'aerodatabox.p.rapidapi.com';
 const OPENWEATHER_KEY = process.env.OPENWEATHER_KEY;
 
+const airportCoordsFallback = {
+  ATL: { lat: 33.6407, lon: -84.4277 },
+  DFW: { lat: 32.8998, lon: -97.0403 },
+  DEN: { lat: 39.8561, lon: -104.6737 },
+  LAX: { lat: 33.9416, lon: -118.4085 },
+  ORD: { lat: 41.9742, lon: -87.9073 },
+  JFK: { lat: 40.6413, lon: -73.7781 },
+  MCO: { lat: 28.4312, lon: -81.3081 },
+  LAS: { lat: 36.0840, lon: -115.1537 },
+  CLT: { lat: 35.2140, lon: -80.9431 },
+  MIA: { lat: 25.7959, lon: -80.2870 },
+  SEA: { lat: 47.4502, lon: -122.3088 },
+  SFO: { lat: 37.6213, lon: -122.3790 },
+  EWR: { lat: 40.6895, lon: -74.1745 },
+  PHX: { lat: 33.4342, lon: -112.0116 },
+  IAH: { lat: 29.9902, lon: -95.3368 },
+  BOS: { lat: 42.3656, lon: -71.0096 },
+  FLL: { lat: 26.0726, lon: -80.1527 },
+  MSP: { lat: 44.8848, lon: -93.2223 },
+  DTW: { lat: 42.2124, lon: -83.3534 },
+  PHL: { lat: 39.8744, lon: -75.2424 },
+  SLC: { lat: 40.7899, lon: -111.9791 },
+  LGA: { lat: 40.7769, lon: -73.8740 },
+  BWI: { lat: 39.1754, lon: -76.6684 },
+  DCA: { lat: 38.8512, lon: -77.0402 },
+  IAD: { lat: 38.9531, lon: -77.4565 },
+  SAN: { lat: 32.7338, lon: -117.1933 },
+  FAT: { lat: 36.7762, lon: -119.7181 }
+};
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -37,52 +67,41 @@ module.exports = async (req, res) => {
     const dep = matchedFlight.departure;
     const arr = matchedFlight.arrival;
 
-   const getWeather = async (coords, label) => {
-  console.log(`${label} coords:`, coords); // this will help us see logs in Vercel
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${OPENWEATHER_KEY}&units=imperial`;
-  const response = await fetch(url);
-  return await response.json();
-};
+    const getCoords = (airport) => {
+      if (airport?.position) return airport.position;
+      return airportCoordsFallback[airport?.iata] || null;
+    };
 
-// Force logging of coordinates before trying to fetch weather
-if (dep.airport.position) {
-  console.log("Departure coords:", dep.airport.position);
-}
-if (arr.airport.position) {
-  console.log("Arrival coords:", arr.airport.position);
-}
+    const getWeather = async (coords) => {
+      if (!coords || !coords.lat || !coords.lon) return null;
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${OPENWEATHER_KEY}&units=imperial`;
+      const response = await fetch(url);
+      return await response.json();
+    };
 
-const depWeather = dep.airport.position
-  ? await getWeather({
-      lat: dep.airport.position.latitude,
-      lon: dep.airport.position.longitude
-    }, "Departure")
-  : null;
+    const depCoords = getCoords(dep.airport);
+    const arrCoords = getCoords(arr.airport);
 
-const arrWeather = arr.airport.position
-  ? await getWeather({
-      lat: arr.airport.position.latitude,
-      lon: arr.airport.position.longitude
-    }, "Arrival")
-  : null;
+    const depWeather = await getWeather(depCoords);
+    const arrWeather = await getWeather(arrCoords);
 
-  res.status(200).json({
-  flight: flightNumber.toUpperCase(),
-  departure: {
-    airport: dep.airport.name,
-    iata: dep.airport.iata,
-    scheduledTime: dep.scheduledTimeLocal,
-    coords: dep.airport.position ?? { lat: "missing", lon: "missing" },
-    weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable"
-  },
-  arrival: {
-    airport: arr.airport.name,
-    iata: arr.airport.iata,
-    scheduledTime: arr.scheduledTimeLocal,
-    coords: arr.airport.position ?? { lat: "missing", lon: "missing" },
-    weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable"
-  }
-});
+    res.status(200).json({
+      flight: flightNumber.toUpperCase(),
+      departure: {
+        airport: dep.airport.name,
+        iata: dep.airport.iata,
+        scheduledTime: dep.scheduledTimeLocal,
+        coords: depCoords || { lat: "unknown", lon: "unknown" },
+        weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable"
+      },
+      arrival: {
+        airport: arr.airport.name,
+        iata: arr.airport.iata,
+        scheduledTime: arr.scheduledTimeLocal,
+        coords: arrCoords || { lat: "unknown", lon: "unknown" },
+        weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable"
+      }
+    });
 
   } catch (err) {
     console.error("API error:", err);
