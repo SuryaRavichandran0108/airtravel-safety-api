@@ -5,6 +5,10 @@ const RAPIDAPI_HOST = 'aerodatabox.p.rapidapi.com';
 const OPENWEATHER_KEY = process.env.OPENWEATHER_KEY;
 
 module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   const flightNumber = req.query.flight;
 
   if (!flightNumber) {
@@ -12,9 +16,8 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Step 1: Get flight info from AeroDataBox
-    const dateToday = new Date().toISOString().split('T')[0]; // format: YYYY-MM-DD
-    const aeroURL = `https://${RAPIDAPI_HOST}/flights/number/${flightNumber}/${dateToday}`;
+    // Step 1: Use the no-date endpoint for broader matching
+    const aeroURL = `https://${RAPIDAPI_HOST}/flights/number/${flightNumber}`;
     
     const flightRes = await fetch(aeroURL, {
       method: 'GET',
@@ -26,24 +29,24 @@ module.exports = async (req, res) => {
 
     const flightData = await flightRes.json();
 
-    if (!flightData || !flightData.departure || !flightData.arrival) {
-      return res.status(404).json({ error: "Flight data not found." });
+    if (!Array.isArray(flightData) || flightData.length === 0) {
+      return res.status(404).json({ error: "Flight data not found. Try a major airline and current flight." });
     }
 
-    const dep = flightData.departure;
-    const arr = flightData.arrival;
+    const matchedFlight = flightData[0];
 
-    // Step 2: Get weather for departure and arrival airports
-    const weather = async (iata) => {
+    const dep = matchedFlight.departure;
+    const arr = matchedFlight.arrival;
+
+    const getWeather = async (iata) => {
       const url = `https://api.openweathermap.org/data/2.5/weather?q=${iata}&appid=${OPENWEATHER_KEY}&units=imperial`;
-      const res = await fetch(url);
-      return await res.json();
+      const response = await fetch(url);
+      return await response.json();
     };
 
-    const depWeather = await weather(dep.airport.iata);
-    const arrWeather = await weather(arr.airport.iata);
+    const depWeather = await getWeather(dep.airport.iata);
+    const arrWeather = await getWeather(arr.airport.iata);
 
-    // Step 3: Respond with combined info
     res.status(200).json({
       flight: flightNumber.toUpperCase(),
       departure: {
@@ -59,8 +62,9 @@ module.exports = async (req, res) => {
         weather: arrWeather.weather ? arrWeather.weather[0].description : "Unavailable"
       }
     });
+
   } catch (err) {
     console.error("API error:", err);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).json({ error: "Internal server error. Try again later." });
   }
 };
