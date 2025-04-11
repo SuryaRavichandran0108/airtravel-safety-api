@@ -67,21 +67,24 @@ const arrWeather = arr.airport.position
   : null;
 
 
-    res.status(200).json({
-      flight: flightNumber.toUpperCase(),
-      departure: {
-        airport: dep.airport.name,
-        iata: dep.airport.iata,
-        scheduledTime: dep.scheduledTimeLocal,
-        weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable"
-      },
-      arrival: {
-        airport: arr.airport.name,
-        iata: arr.airport.iata,
-        scheduledTime: arr.scheduledTimeLocal,
-        weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable"
-      }
-    });
+   res.status(200).json({
+  flight: flightNumber.toUpperCase(),
+  departure: {
+    airport: dep.airport.name,
+    iata: dep.airport.iata,
+    scheduledTime: dep.scheduledTimeLocal,
+    coords: dep.airport.position,
+    weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable"
+  },
+  arrival: {
+    airport: arr.airport.name,
+    iata: arr.airport.iata,
+    scheduledTime: arr.scheduledTimeLocal,
+    coords: arr.airport.position,
+    weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable"
+  }
+});
+
 
   } catch (err) {
     console.error("API error:", err);
