@@ -1,7 +1,10 @@
 const { google } = require('googleapis');
 
 const sheetId = '1oCBdA6sp_XOTAWgMDrVsSrSQo8_n2WcLwhusJ4C6NGw';
-const sheets = google.sheets({ version: 'v4' });
+const sheets = google.sheets({
+  version: 'v4',
+  auth: process.env.AIzaSyCBO20AfI7OzYwBYworbfJRIOZ7qlv_S5c
+});
 
 module.exports = async (req, res) => {
   try {
