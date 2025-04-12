@@ -90,7 +90,7 @@ module.exports = async (req, res) => {
       departure: {
         airport: dep.airport.name,
         iata: dep.airport.iata,
-        scheduledTime: dep.scheduledTimeLocal,
+        scheduledTime: dep.scheduledTimeLocal || "Not available",
         coords: depCoords || { lat: "unknown", lon: "unknown" },
         weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable",
         icon: depWeather?.weather ? depWeather.weather[0].icon : "01d"
@@ -98,7 +98,7 @@ module.exports = async (req, res) => {
       arrival: {
         airport: arr.airport.name,
         iata: arr.airport.iata,
-        scheduledTime: arr.scheduledTimeLocal,
+        scheduledTime: dep.scheduledTimeLocal || "Not available",
         coords: arrCoords || { lat: "unknown", lon: "unknown" },
         weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable",
         icon: arrWeather?.weather ? arrWeather.weather[0].icon : "01d"
