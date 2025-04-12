@@ -85,6 +85,9 @@ module.exports = async (req, res) => {
     const depWeather = await getWeather(depCoords);
     const arrWeather = await getWeather(arrCoords);
 
+    console.log("🛫 Departure Object:", JSON.stringify(dep, null, 2));
+    console.log("🛬 Arrival Object:", JSON.stringify(arr, null, 2));
+
     res.status(200).json({
       flight: flightNumber.toUpperCase(),
       departure: {
