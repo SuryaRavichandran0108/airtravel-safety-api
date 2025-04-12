@@ -88,21 +88,21 @@ module.exports = async (req, res) => {
     res.status(200).json({
       flight: flightNumber.toUpperCase(),
       departure: {
-        airport: dep.airport.name,
-        iata: dep.airport.iata,
-        scheduledTime: dep.scheduledTimeLocal || "Not available",
-        coords: depCoords || { lat: "unknown", lon: "unknown" },
-        weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable",
-        icon: depWeather?.weather ? depWeather.weather[0].icon : "01d"
-      },
+  airport: dep.airport.name,
+  iata: dep.airport.iata,
+  scheduledTime: dep.scheduledTimeLocal || dep.scheduledTimeUtc || "Unavailable",
+  coords: depCoords || { lat: "unknown", lon: "unknown" },
+  weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable",
+  icon: depWeather?.weather ? depWeather.weather[0].icon : "01d"
+},
       arrival: {
-        airport: arr.airport.name,
-        iata: arr.airport.iata,
-        scheduledTime: dep.scheduledTimeLocal || "Not available",
-        coords: arrCoords || { lat: "unknown", lon: "unknown" },
-        weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable",
-        icon: arrWeather?.weather ? arrWeather.weather[0].icon : "01d"
-      }
+  airport: arr.airport.name,
+  iata: arr.airport.iata,
+  scheduledTime: arr.scheduledTimeLocal || arr.scheduledTimeUtc || "Unavailable",
+  coords: arrCoords || { lat: "unknown", lon: "unknown" },
+  weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable",
+  icon: arrWeather?.weather ? arrWeather.weather[0].icon : "01d"
+}
     });
 
   } catch (err) {
