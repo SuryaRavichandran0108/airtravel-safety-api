@@ -32,6 +32,7 @@ Air travel often feels intimidating, but statistical data paints a different pic
 ├── index.html              # Static site hosted on AWS S3
 ├── api/
 │   └── safety.js           # Serverless function to fetch safety data
+│   └── flightweather.js    # Serverless function to fetch flight and weather data
 ├── vercel.json             # Vercel routing and build configuration
 ├── package.json            # Project metadata and dependency list
 ```
