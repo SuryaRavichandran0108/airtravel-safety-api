@@ -2,6 +2,8 @@
 
 This project is a live, data-driven website aimed at helping nervous flyers understand the true safety of air travel through clear statistics and visual comparisons with other transportation modes.
 
+Update 2.0 includes the “Flying Today?” function, which is a personalized reassurance tool that lets users enter a flight number (e.g., AA2025) and instantly see the weather conditions at their departure and arrival airports. It complements the broader air safety statistics on the site by offering context-specific insights.
+
 ---
 
 ## Overview
