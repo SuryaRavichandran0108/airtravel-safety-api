@@ -92,14 +92,16 @@ module.exports = async (req, res) => {
         iata: dep.airport.iata,
         scheduledTime: dep.scheduledTimeLocal,
         coords: depCoords || { lat: "unknown", lon: "unknown" },
-        weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable"
+        weather: depWeather?.weather ? depWeather.weather[0].description : "Unavailable",
+        icon: depWeather?.weather ? depWeather.weather[0].icon : "01d"
       },
       arrival: {
         airport: arr.airport.name,
         iata: arr.airport.iata,
         scheduledTime: arr.scheduledTimeLocal,
         coords: arrCoords || { lat: "unknown", lon: "unknown" },
-        weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable"
+        weather: arrWeather?.weather ? arrWeather.weather[0].description : "Unavailable",
+        icon: arrWeather?.weather ? arrWeather.weather[0].icon : "01d"
       }
     });
 
