@@ -19,7 +19,7 @@ Arrival: DFW at 2025-04-23T17:30 – broken clouds Mild conditions expected. Not
 ## Environment Variables
 | Key               | Description                   |
 |-------------------|-------------------------------|
-| `RAPIDAPI_KEY`    | b6b4f745e5mshda6d2c5c5e6a41ap148b97jsn3579d60c04b5    |
-| `OPENWEATHER_KEY` | 981fd24ec0ab650fb48bcb33c3cc80a7   |
+| `RAPIDAPI_KEY`    | b6b4f745e5mshda6d2c5c5...  |
+| `OPENWEATHER_KEY` | 981fd24ec0ab650fb48bcb...   |
 
 
